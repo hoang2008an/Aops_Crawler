@@ -176,3 +176,4 @@ Desktop.ini
 *.log
 crawled_data/
 output/
+browser_data/

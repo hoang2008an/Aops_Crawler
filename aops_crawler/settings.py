@@ -13,7 +13,11 @@ SPIDER_MODULES = ["aops_crawler.spiders"]
 NEWSPIDER_MODULE = "aops_crawler.spiders"
 
 ADDONS = {}
-
+DOWNLOAD_HANDLERS = {
+    'http': 'aops_crawler.download_handlers.ScrapyPatchrightDownloadHandler',
+    'https': 'aops_crawler.download_handlers.ScrapyPatchrightDownloadHandler',
+    # Add more custom handlers here
+}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "aops_crawler (+http://www.yourdomain.com)"
@@ -23,7 +27,7 @@ ROBOTSTXT_OBEY = False
 
 # Concurrency and throttling settings
 #CONCURRENT_REQUESTS = 16
-CONCURRENT_REQUESTS_PER_DOMAIN = 8
+CONCURRENT_REQUESTS_PER_DOMAIN = 12
 DOWNLOAD_DELAY = 1
 
 # Disable cookies (enabled by default)
