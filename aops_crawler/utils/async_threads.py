@@ -62,6 +62,7 @@ def run_coro_on_background_loop(coro):
                 loop.run_forever()
             t = Thread(target=_run, name="bg-proactor-loop", daemon=True)
             t.start()
+            ready.wait()  # Wait for loop to be ready before proceeding
             # publish
             global _BG_THREAD
             _BG_LOOP = loop
