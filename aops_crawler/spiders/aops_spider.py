@@ -31,7 +31,45 @@ class QuotesSpider(scrapy.Spider):
     def parse_category(self, response):
         # response.body is json.dump.encode('utf-8') we need to decode it to a object   
         json_data = json.loads(response.body.decode('utf-8'))
-        # save data to a file
-        with open("test/category.json", "w") as f:
-            json.dump(json_data, f)
         
+        # Extract items from the first filtered response
+        first_filtered = json_data.get("first_filtered", {})
+        response_json = first_filtered.get("response_json", {})
+        
+        category_data = response_json.get("response", {}).get("category", {})
+        items = category_data.get("items", [])
+        
+        print(f"Found {len(items)} items in category")
+        
+        # Extract item_id and item_type for each item
+        for item in items:
+            item_id = item.get("item_id")
+            item_type = item.get("item_type")
+            
+            # print(f"Item ID: {item_id}, Type: {item_type}, Text: {item_text}")
+            
+            # You can yield more requests here based on item_type
+            if item_type == "folder" or item_type=='view_posts':
+                # This is a subfolder, crawl it
+                yield scrapy.Request(
+                    url=f"https://artofproblemsolving.com/community/c{item_id}", 
+                    callback=self.parse_category,
+                    meta={"driver":"category"}
+                )
+            elif item_type == "post" and item["post_data"]["post_type"]=="forum":
+                # This is a forum, you might want to crawl posts
+                yield scrapy.Request(
+                    url=f"https://artofproblemsolving.com/community/p{item_id}", 
+                    callback=self.parse_post,
+                    meta={"driver":"post"}
+                )
+                # Add forum crawling logic here if needed
+        
+        # # save data to a file for debugging
+        # with open("test/category.json", "w") as f:
+        #     json.dump(json_data, f)
+    def parse_post(self, response):
+        # the response is a html response
+        # save it to a file to test
+        with open("test/post.html", "w", encoding="utf-8") as f:
+            f.write(response.css("body").get())

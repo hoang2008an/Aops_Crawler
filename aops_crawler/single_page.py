@@ -173,9 +173,10 @@ async def crawl_category(
     first_filtered: Optional[Dict[str, Any]] = None
 
     async def on_request_finished(request):
+
         if getattr(request, "resource_type", None) not in capture_types:
             return
-
+        print(request.url)
         body_raw: Optional[str] = getattr(request, "post_data", None)
         post_params: Optional[Dict[str, Any]] = None
         resp_text: Optional[str] = None
@@ -219,7 +220,6 @@ async def crawl_category(
             "response_json": resp_json,
         }
         ajax_requests.append(entry)
-
         try:
             if (
                 filter_post_key is not None
@@ -229,6 +229,7 @@ async def crawl_category(
                 and not first_filtered_event.is_set()
             ):
                 nonlocal first_filtered
+                print("first_filtered")
                 first_filtered = entry
                 first_filtered_event.set()
         except Exception:
@@ -284,8 +285,8 @@ async def crawl_post(
     initial_wait_ms: int = 0,
     stop_settle_ms: int = 10000,
     block_images: bool = False,
-    scroll_selector: str,
-    ready_xpath: Optional[str] = None,
+    scroll_selector:str = "/html/body/div[1]/div[3]/div/div/div[3]/div/div[4]/div/div[2]",
+    ready_xpath: str = '//*[@id="cmty-topic-view-right"]/div/div[4]/div/div[2]/div/div[2]',
     ready_timeout_ms: int = 15000,
 ) -> Response:
     page = await browser.new_page()
@@ -394,17 +395,16 @@ async def main():
     print("Starting...")
     async with async_playwright() as p:
         browser = await p.chromium.launch_persistent_context(headless=False, channel="msedge", no_viewport=True, user_data_dir="./browser_data/msedge")
-        res = await crawl_contest_page(
-            "https://artofproblemsolving.com/community/c13_contests",
+        res = await crawl_category(
+            "https://artofproblemsolving.com/community/c14",
             browser=browser,
-            block_images=False,
             # scroll_selector="/html/body/div[1]/div[3]/div/div/div[3]/div/div[4]/div/div[2]",
             # ready_xpath='//*[@id="cmty-topic-view-right"]/div/div[4]/div/div[2]/div/div[2]',
         )
-        output_path = Path("test/output.html")
-        with output_path.open("w", encoding="utf-8") as f:
-            f.write(res.text)  # write full HTML
-        print(f"Saved HTML to {output_path.resolve()}")
+        # output_path = Path("test/output.html")
+        # with output_path.open("w", encoding="utf-8") as f:
+        #     f.write(res.text)  # write full HTML
+        # print(f"Saved HTML to {output_path.resolve()}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,5 @@
+two table
+one for post
+one for category
+each row will contain the parent cateogry that contain it
+for post we need to remove img and replace it with the label

@@ -132,12 +132,6 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
                 return await crawl_contest_page(
                     request.url,
                     browser=self._shared_ctx,
-                    wait_until=request.meta.get("wait_until", "domcontentloaded"),
-                    wait_for_selector=request.meta.get("wait_for_selector", "body"),
-                    timeout_ms=request.meta.get("timeout_ms", 30000),
-                    max_scrolls=request.meta.get("max_scrolls", 10),
-                    scroll_pause_ms=request.meta.get("scroll_pause_ms", 800),
-                    block_images=request.meta.get("block_images", False),
                 )
             return run_coro_on_background_loop(_run())
         if driver == "category":
@@ -148,12 +142,6 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
                 return await crawl_category(
                     request.url,
                     browser=self._shared_ctx,
-                    wait_until=request.meta.get("wait_until", "domcontentloaded"),
-                    wait_for_selector=request.meta.get("wait_for_selector", "body"),
-                    timeout_ms=request.meta.get("timeout_ms", 90000),
-                    block_images=request.meta.get("block_images", False),
-                    filter_post_key=request.meta.get("filter_post_key", "a"),
-                    filter_post_value=request.meta.get("filter_post_value", "fetch_category_data"),
                 )
             return run_coro_on_background_loop(_run())
         if driver == "post":
@@ -164,17 +152,6 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
                 return await crawl_post(
                     request.url,
                     browser=self._shared_ctx,
-                    wait_until=request.meta.get("wait_until", "domcontentloaded"),
-                    wait_for_selector=request.meta.get("wait_for_selector", "body"),
-                    timeout_ms=request.meta.get("timeout_ms", 30000),
-                    max_scrolls=request.meta.get("max_scrolls", 60),
-                    scroll_pause_ms=request.meta.get("scroll_pause_ms", 100),
-                    initial_wait_ms=request.meta.get("initial_wait_ms", 0),
-                    stop_settle_ms=request.meta.get("stop_settle_ms", 10000),
-                    block_images=request.meta.get("block_images", False),
-                    scroll_selector=request.meta["scroll_selector"],
-                    ready_xpath=request.meta.get("ready_xpath"),
-                    ready_timeout_ms=request.meta.get("ready_timeout_ms", 15000),
                 )
             return run_coro_on_background_loop(_run())
 
