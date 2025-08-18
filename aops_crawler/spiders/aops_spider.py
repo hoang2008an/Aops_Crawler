@@ -10,7 +10,15 @@ class QuotesSpider(scrapy.Spider):
 
         ]
         for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse_contest,meta={"driver":"contest"})
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_contest,
+                meta={
+                    "driver": "contest",
+                    "id": 13,
+                    "parent_id": None,
+                },
+            )
 
     def parse_contest(self, response):
         # response.body is json.dump.encode('utf-8') we need to decode it to a object   
@@ -26,7 +34,15 @@ class QuotesSpider(scrapy.Spider):
                 cats = (rt.get("response") or {}).get("categories") or []
                 for c in cats :
                     if "category_id" in c:
-                        yield scrapy.Request(url=f"https://artofproblemsolving.com/community/c{c.get('category_id')}", callback=self.parse_category,meta={"driver":"category"})
+                        yield scrapy.Request(
+                            url=f"https://artofproblemsolving.com/community/c{c.get('category_id')}",
+                            callback=self.parse_category,
+                            meta={
+                                "driver": "category",
+                                "id": c.get("category_id"),
+                                "parent_id": response.meta.get("id", 13),
+                            },
+                        )
                         # yield scrapy.Request(url=, callback=self.parse_contest,meta={"driver":"contest"})
     def parse_category(self, response):
         # response.body is json.dump.encode('utf-8') we need to decode it to a object   
@@ -54,14 +70,22 @@ class QuotesSpider(scrapy.Spider):
                 yield scrapy.Request(
                     url=f"https://artofproblemsolving.com/community/c{item_id}", 
                     callback=self.parse_category,
-                    meta={"driver":"category"}
+                    meta={
+                        "driver": "category",
+                        "id": item_id,
+                        "parent_id": response.meta.get("id"),
+                    }
                 )
             elif item_type == "post" and item["post_data"]["post_type"]=="forum":
                 # This is a forum, you might want to crawl posts
                 yield scrapy.Request(
                     url=f"https://artofproblemsolving.com/community/p{item_id}", 
                     callback=self.parse_post,
-                    meta={"driver":"post"}
+                    meta={
+                        "driver": "post",
+                        "id": item_id,  # post id
+                        "parent_id": response.meta.get("id"),  # parent category id
+                    }
                 )
                 # Add forum crawling logic here if needed
         
