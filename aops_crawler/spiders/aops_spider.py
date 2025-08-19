@@ -1,13 +1,13 @@
 import json
 import scrapy
+from aops_crawler.items import CategoryItem, PostItem
 
 class QuotesSpider(scrapy.Spider):
     name = "aops_crawler"
 
-    async def start(self):
+    def start_requests(self):
         urls = [
             "https://artofproblemsolving.com/community/c13_contests",
-
         ]
         for url in urls:
             yield scrapy.Request(
@@ -65,7 +65,7 @@ class QuotesSpider(scrapy.Spider):
             # print(f"Item ID: {item_id}, Type: {item_type}, Text: {item_text}")
             
             # You can yield more requests here based on item_type
-            if item_type == "folder" or item_type=='view_posts':
+            if item_type == "folder" or item_type == 'view_posts':
                 # This is a subfolder, crawl it
                 yield scrapy.Request(
                     url=f"https://artofproblemsolving.com/community/c{item_id}", 
@@ -75,6 +75,14 @@ class QuotesSpider(scrapy.Spider):
                         "id": item_id,
                         "parent_id": response.meta.get("id"),
                     }
+                )
+                # Also yield a CategoryItem for pipelines
+                yield CategoryItem(
+                    category_id=item_id,
+                    parent_id=response.meta.get("id"),
+                    name=item.get("title") or item.get("name"),
+                    url=f"https://artofproblemsolving.com/community/c{item_id}",
+                    raw=item,
                 )
             elif item_type == "post" and item["post_data"]["post_type"]=="forum":
                 # This is a forum, you might want to crawl posts
@@ -93,7 +101,13 @@ class QuotesSpider(scrapy.Spider):
         # with open("test/category.json", "w") as f:
         #     json.dump(json_data, f)
     def parse_post(self, response):
-        # the response is a html response
-        # save it to a file to test
-        with open("test/post.html", "w", encoding="utf-8") as f:
-            f.write(response.css("body").get())
+        # Extract basic post info and yield to pipelines
+        title_text = response.css("title::text").get()
+        main_html = response.css("#cmty-topic-view-right").get() or response.css("body").get()
+        yield PostItem(
+            post_id=response.meta.get("id"),
+            parent_id=response.meta.get("parent_id"),
+            url=response.url,
+            title=title_text,
+            content_html=main_html,
+        )

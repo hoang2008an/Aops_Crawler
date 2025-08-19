@@ -10,3 +10,19 @@ class AopsCrawlerItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
+
+
+class CategoryItem(scrapy.Item):
+    category_id = scrapy.Field()
+    parent_id = scrapy.Field()
+    name = scrapy.Field()
+    url = scrapy.Field()
+    raw = scrapy.Field()
+
+
+class PostItem(scrapy.Item):
+    post_id = scrapy.Field()
+    parent_id = scrapy.Field()
+    url = scrapy.Field()
+    title = scrapy.Field()
+    content_html = scrapy.Field()
