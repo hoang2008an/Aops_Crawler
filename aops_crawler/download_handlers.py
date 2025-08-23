@@ -12,8 +12,11 @@ from aops_crawler.utils.async_threads import (
     run_coro_on_background_loop,
     start_background_proactor_loop,
 )
+import logging
 
 __all__ = ["ScrapyPatchrightDownloadHandler"]
+
+logger = logging.getLogger(__name__)
 
 
 class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
@@ -99,7 +102,7 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
                         await self._shared_ctx.close()
                     except Exception as e:
                         # Log but don't fail - context might already be closed
-                        print(f"Warning: Context close failed: {e}")
+                        logger.warning(f"Warning: Context close failed: {e}")
             except Exception:
                 pass
             finally:
@@ -110,7 +113,7 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
                     try:
                         await self._browser.close()
                     except Exception as e:
-                        print(f"Warning: Browser close failed: {e}")
+                        logger.warning(f"Warning: Browser close failed: {e}")
             except Exception:
                 pass
             finally:
@@ -121,8 +124,7 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
     # ---- Scrapy entry point ----
     def download_request(self, request: Request, spider) -> Deferred:
         driver = request.meta.get("driver", "http")
-        print(driver)
-        print("--------------------------------------------------")
+        logger.debug(f"[DownloadHandler] driver={driver} url={request.url}")
         if driver == "contest":
             async def _run():
                 import asyncio
@@ -160,10 +162,10 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
 # class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
 #     def download_request(self, request, spider):
 #         # Custom header added to request
-#         print(request.meta)
-#         print("--------------------------------------------------")
+#         # print(request.meta)
+#         # print("--------------------------------------------------")
 #         request.headers.setdefault(b'Authorization', b'Bearer mysecrettoken')
 #         response = super().download_request(request, spider)
 #         # Custom processing after download
- 
+#         
 #         return response

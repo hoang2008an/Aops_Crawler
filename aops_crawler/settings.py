@@ -19,6 +19,11 @@ DOWNLOAD_HANDLERS = {
     # Add more custom handlers here
 }
 
+# Duplicate request handling: run custom code while still rejecting duplicates
+DUPEFILTER_CLASS = 'aops_crawler.dupefilters.LinkingDupeFilter'
+# Path for SQLite store used by dupefilter to record connections
+AOPS_SQLITE_PATH = "./browser_data/aops.sqlite3"
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "aops_crawler (+http://www.yourdomain.com)"
 
@@ -27,7 +32,7 @@ ROBOTSTXT_OBEY = False
 
 # Concurrency and throttling settings
 #CONCURRENT_REQUESTS = 16
-CONCURRENT_REQUESTS_PER_DOMAIN = 12
+CONCURRENT_REQUESTS_PER_DOMAIN = 6
 DOWNLOAD_DELAY = 1
 
 # Disable cookies (enabled by default)
@@ -89,3 +94,10 @@ ITEM_PIPELINES = {
 
 # Set settings whose default value is deprecated to a future-proof value
 FEED_EXPORT_ENCODING = "utf-8"
+
+# Logging configuration: write project logs to test/aops.log
+import os as _os
+_os.makedirs("test", exist_ok=True)
+LOG_ENABLED = True
+LOG_LEVEL = "INFO"
+LOG_FILE = "test/aops.log"

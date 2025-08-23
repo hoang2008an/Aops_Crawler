@@ -1,13 +1,16 @@
 import json
 import scrapy
 from aops_crawler.items import CategoryItem, PostItem
+import logging
+
+logger = logging.getLogger(__name__)
 
 class QuotesSpider(scrapy.Spider):
     name = "aops_crawler"
 
-    def start_requests(self):
+    async def start(self):
         urls = [
-            "https://artofproblemsolving.com/community/c13_contests",
+            "https://artofproblemsolving.com/community/c13",
         ]
         for url in urls:
             yield scrapy.Request(
@@ -30,8 +33,9 @@ class QuotesSpider(scrapy.Spider):
         for req in json_data["ajax_requests"]:
             rt = req.get("response_json")
             if isinstance(rt, dict):
-                print("--------------------------------")
+                # print("--------------------------------")
                 cats = (rt.get("response") or {}).get("categories") or []
+                logger.info(f"[Spider] Found {len(cats)} categories in contest page")
                 for c in cats :
                     if "category_id" in c:
                         yield scrapy.Request(
@@ -55,7 +59,7 @@ class QuotesSpider(scrapy.Spider):
         category_data = response_json.get("response", {}).get("category", {})
         items = category_data.get("items", [])
         
-        print(f"Found {len(items)} items in category")
+        logger.info(f"[Spider] Category {response.meta.get('id')} has {len(items)} items")
         
         # Extract item_id and item_type for each item
         for item in items:
@@ -101,13 +105,9 @@ class QuotesSpider(scrapy.Spider):
         # with open("test/category.json", "w") as f:
         #     json.dump(json_data, f)
     def parse_post(self, response):
-        # Extract basic post info and yield to pipelines
-        title_text = response.css("title::text").get()
-        main_html = response.css("#cmty-topic-view-right").get() or response.css("body").get()
         yield PostItem(
             post_id=response.meta.get("id"),
             parent_id=response.meta.get("parent_id"),
             url=response.url,
-            title=title_text,
-            content_html=main_html,
+            response=response,
         )

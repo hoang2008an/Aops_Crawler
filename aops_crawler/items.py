@@ -24,5 +24,4 @@ class PostItem(scrapy.Item):
     post_id = scrapy.Field()
     parent_id = scrapy.Field()
     url = scrapy.Field()
-    title = scrapy.Field()
-    content_html = scrapy.Field()
+    response = scrapy.Field()  # carry the full Scrapy response for pipeline parsing
