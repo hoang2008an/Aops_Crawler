@@ -32,7 +32,7 @@ ROBOTSTXT_OBEY = False
 
 # Concurrency and throttling settings
 #CONCURRENT_REQUESTS = 16
-CONCURRENT_REQUESTS_PER_DOMAIN = 6
+CONCURRENT_REQUESTS_PER_DOMAIN = 50
 DOWNLOAD_DELAY = 1
 
 # Disable cookies (enabled by default)
@@ -96,8 +96,6 @@ ITEM_PIPELINES = {
 FEED_EXPORT_ENCODING = "utf-8"
 
 # Logging configuration: write project logs to test/aops.log
-import os as _os
-_os.makedirs("test", exist_ok=True)
 LOG_ENABLED = True
 LOG_LEVEL = "INFO"
 LOG_FILE = "test/aops.log"

@@ -13,7 +13,7 @@ from aops_crawler.utils.async_threads import (
     start_background_proactor_loop,
 )
 import logging
-
+import asyncio
 __all__ = ["ScrapyPatchrightDownloadHandler"]
 
 logger = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
         logger.debug(f"[DownloadHandler] driver={driver} url={request.url}")
         if driver == "contest":
             async def _run():
-                import asyncio
+                # import asyncio
                 # wait until shared context is ready
                 while self._shared_ctx is None:
                     await asyncio.sleep(0.05)
@@ -138,7 +138,7 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
             return run_coro_on_background_loop(_run())
         if driver == "category":
             async def _run():
-                import asyncio
+                # import asyncio
                 while self._shared_ctx is None:
                     await asyncio.sleep(0.05)
                 return await crawl_category(
@@ -148,7 +148,7 @@ class ScrapyPatchrightDownloadHandler(HTTPDownloadHandler):
             return run_coro_on_background_loop(_run())
         if driver == "post":
             async def _run():
-                import asyncio
+                # import asyncio
                 while self._shared_ctx is None:
                     await asyncio.sleep(0.05)
                 return await crawl_post(
